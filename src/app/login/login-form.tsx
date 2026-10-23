@@ -47,31 +47,13 @@ export function LoginForm({ linkError }: { linkError?: boolean }) {
       <div>
         <h1 className="font-serif text-4xl leading-tight">Check your email</h1>
         <p className="mt-2 text-ink-soft">
-          If <span className="text-ink">{state.email}</span> has a project with the studio, a sign-in email is on its way.
-          Tap the link, or type the 6-digit code here.
+          If <span className="text-ink">{state.email}</span> has a project with the studio, a sign-in link is on its way.
+          Tap it to open your portal.
+        </p>
+        <p className="mt-3 text-sm text-ink-faint">
+          The link works once and expires after 15 minutes. Nothing arrived? Check spam, or try again in a minute.
         </p>
       </div>
-      <div>
-        <label htmlFor="code" className="label">
-          6-digit code
-        </label>
-        <input
-          id="code"
-          name="code"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          pattern="[0-9 ]{6,7}"
-          maxLength={7}
-          required
-          autoFocus
-          className="field font-mono text-lg tracking-[0.4em]"
-          placeholder="••••••"
-        />
-      </div>
-      {state.error && <p className="text-sm text-danger">{state.error}</p>}
-      <button type="submit" disabled={pending} className="btn-primary w-full">
-        {pending ? "Checking…" : "Sign in"}
-      </button>
       <button
         type="submit"
         name="intent"

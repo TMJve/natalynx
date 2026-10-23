@@ -1,7 +1,7 @@
 # Nata Studio — client portal
 
 A small, calm portal where clients see where their project is, what's next, and where their money is at.
-Clients sign in with an emailed link or 6-digit code (no passwords). The admin (the studio) manages everything.
+Clients sign in with an emailed link (no passwords). The admin (the studio) manages everything.
 
 **Stack:** Next.js 16 (App Router) + TypeScript + Tailwind CSS 4 · Supabase (Postgres database, Auth, Storage) · Vercel.
 
@@ -107,14 +107,13 @@ Variables starting with `NEXT_PUBLIC_` are copied into the browser bundle. Anyth
 
 3. **Authentication settings** (Dashboard → Authentication):
    - *Sign In / Providers*: turn **off** "Allow new users to sign up". Keep the **Email** provider **on**.
-   - *Email* provider: set the **Email OTP expiration** to `900` seconds (15 minutes) and the **OTP length** to `6`.
-     (OTP = one-time password, the 6-digit code.)
+   - *Email* provider: set the **Email OTP expiration** to `900` seconds (15 minutes), so links expire quickly.
    - *URL Configuration*: set **Site URL** to your portal's address, e.g. `https://portal.natastudio.com`.
      Add the same address followed by `/**` under **Redirect URLs**.
    - *Emails → Templates → Magic Link*: subject `Your Nata Studio sign-in`. For the body, paste the contents of
-     [`supabase/templates/magic_link.html`](supabase/templates/magic_link.html). This template includes both the
-     link and the 6-digit code. Clients reading email on a phone often open links in their mail app's built-in
-     browser; the code lets them sign in from any browser.
+     [`supabase/templates/magic_link.html`](supabase/templates/magic_link.html). Supabase only uses custom
+     templates once custom SMTP (step 4) is set up; until then it sends its default email, and the portal accepts
+     that link too.
 
 4. **Custom email sending (SMTP)**. Required before inviting real clients. Supabase's built-in sender is for testing
    only and allows just a few emails per hour. SMTP is the standard protocol for sending email. Create an account with
