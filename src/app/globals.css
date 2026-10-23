@@ -1,26 +1,80 @@
 @import "tailwindcss";
 
+/*
+  Nata Studio palette
+  - ink: "light black", used for text and primary buttons
+  - accent: blood orange, the single accent (current stage, things waiting on the client)
+  - canvas/surface/line: warm neutrals that keep the page calm
+*/
+@theme {
+  --color-canvas: #f7f4ef;
+  --color-surface: #ffffff;
+  --color-line: #e8e2d9;
+  --color-line-strong: #d6cec2;
+
+  --color-ink: #2a2826;
+  --color-ink-soft: #625d57;
+  --color-ink-faint: #8f8a83;
+
+  --color-accent: #c4401c;
+  --color-accent-strong: #a8360f;
+  --color-accent-tint: #f9e9e2;
+
+  --color-danger: #a12a1d;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-card: 1.25rem;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-accent-tint);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@utility card {
+  @apply rounded-[var(--radius-card)] bg-surface p-6 shadow-[0_1px_2px_rgba(42,40,38,0.04)] ring-1 ring-line/70;
+}
+@utility eyebrow {
+  @apply text-[11px] font-medium tracking-[0.14em] text-ink-faint uppercase;
+}
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-ink text-white hover:bg-black;
+}
+@utility btn-accent {
+  @apply btn bg-accent text-white hover:bg-accent-strong;
+}
+@utility btn-ghost {
+  @apply btn bg-transparent text-ink ring-1 ring-line-strong hover:bg-canvas;
+}
+@utility field {
+  @apply block w-full rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-[16px] text-ink placeholder:text-ink-faint focus:border-ink focus:ring-2 focus:ring-accent/25 focus:outline-none focus-visible:outline-none sm:text-sm;
+}
+@utility label {
+  @apply mb-1.5 block text-xs font-medium text-ink-soft;
 }

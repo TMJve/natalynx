@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <rect width="1200" height="900" fill="#f7f4ef"/>
+  <g>
+    <rect x="50" y="150" width="340" height="600" rx="24" fill="#ffffff"/>
+    <circle cx="220" cy="390" r="110" fill="none" stroke="#2a2826" stroke-width="14"/>
+    <path d="M160 430 Q220 300 280 430" fill="none" stroke="#c4401c" stroke-width="14" stroke-linecap="round"/>
+    <text x="220" y="620" text-anchor="middle" font-family="Georgia, serif" font-size="44" fill="#2a2826">Fern &amp; Field</text>
+    <text x="220" y="690" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#8f8a83">A · Sprout</text>
+  </g>
+  <g>
+    <rect x="430" y="150" width="340" height="600" rx="24" fill="#2a2826"/>
+    <rect x="530" y="290" width="140" height="200" rx="70" fill="#c4401c"/>
+    <text x="600" y="620" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="40" letter-spacing="6" fill="#ffffff">FERN&amp;FIELD</text>
+    <text x="600" y="690" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#b5afa7">B · Arch</text>
+  </g>
+  <g>
+    <rect x="810" y="150" width="340" height="600" rx="24" fill="#e9dccb"/>
+    <text x="980" y="460" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="150" fill="#2a2826">f&amp;f</text>
+    <text x="980" y="620" text-anchor="middle" font-family="Georgia, serif" font-size="40" fill="#2a2826">fern and field</text>
+    <text x="980" y="690" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#7d6f63">C · Script</text>
+  </g>
+  <text x="600" y="90" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="26" fill="#625d57">Three concept directions · round 1</text>
+</svg>

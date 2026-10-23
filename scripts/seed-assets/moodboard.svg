@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <rect width="1200" height="900" fill="#f1ebe2"/>
+  <rect x="60" y="60" width="520" height="500" rx="24" fill="#2a2826"/>
+  <circle cx="320" cy="310" r="150" fill="#c4401c"/>
+  <circle cx="320" cy="310" r="80" fill="#2a2826"/>
+  <rect x="620" y="60" width="520" height="240" rx="24" fill="#d9c9b4"/>
+  <rect x="620" y="320" width="250" height="240" rx="24" fill="#e7a07f"/>
+  <rect x="890" y="320" width="250" height="240" rx="24" fill="#7d6f63"/>
+  <rect x="60" y="600" width="1080" height="240" rx="24" fill="#ffffff"/>
+  <text x="110" y="745" font-family="Georgia, serif" font-size="96" fill="#2a2826">Fern &amp; Field</text>
+  <g font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#625d57">
+    <text x="660" y="275">Warm, grounded, a little wild</text>
+  </g>
+  <g>
+    <circle cx="840" cy="720" r="34" fill="#c4401c"/>
+    <circle cx="920" cy="720" r="34" fill="#2a2826"/>
+    <circle cx="1000" cy="720" r="34" fill="#d9c9b4"/>
+    <circle cx="1080" cy="720" r="34" fill="#7d6f63"/>
+  </g>
+</svg>
