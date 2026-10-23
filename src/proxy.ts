@@ -25,6 +25,9 @@ export async function proxy(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const signedIn = Boolean(data?.claims?.sub);
   const { pathname } = request.nextUrl;
+  // Only redirect page visits. Form saves (POSTs to server actions) must get a real response;
+  // the actions check permissions themselves and explain the problem instead.
+  if (request.method !== "GET" && request.method !== "HEAD") return response;
 
   const isPrivate = pathname.startsWith("/portal") || pathname.startsWith("/admin");
   if (!signedIn && isPrivate) {

@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { refresh } from "next/cache";
-import { requireAdmin } from "@/lib/auth";
+import { getViewer } from "@/lib/auth";
 import { createClient, createMailerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { StageStatus } from "@/lib/types";
@@ -15,6 +15,18 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // --- small helpers ----------------------------------------------------------
+
+// Admin check for actions. Returns a message (rather than redirecting mid-save) so a stale admin
+// tab — e.g. after signing in as a client in the same browser — explains itself instead of crashing.
+async function notAdmin(): Promise<ActionResult | null> {
+  const viewer = await getViewer();
+  if (viewer?.isAdmin) return null;
+  return {
+    error: viewer
+      ? `This browser is now signed in as ${viewer.email ?? "a client"}, so this wasn't saved. Sign out and sign in as admin.`
+      : "You've been signed out, so this wasn't saved. Sign in again.",
+  };
+}
 
 function text(fd: FormData, key: string, max = 2000): string {
   return String(fd.get(key) ?? "").trim().slice(0, max);
@@ -56,7 +68,8 @@ async function sendSignInEmail(email: string) {
 // --- clients & projects -----------------------------------------------------
 
 export async function createClientProject(_prev: ActionResult, fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const email = text(fd, "email", 254).toLowerCase();
   const clientName = text(fd, "client_name", 120);
   const company = text(fd, "company", 120);
@@ -111,7 +124,8 @@ export async function createClientProject(_prev: ActionResult, fd: FormData): Pr
 }
 
 export async function resendInvite(fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const clientId = uuid(fd, "client_id");
   const supabase = await createClient();
   const { data: client } = await supabase.from("clients").select("email").eq("id", clientId).maybeSingle();
@@ -124,7 +138,8 @@ export async function resendInvite(fd: FormData): Promise<ActionResult> {
 }
 
 export async function updateProject(fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const projectId = uuid(fd, "project_id");
   const rounds = Number(text(fd, "revision_rounds", 2));
   const name = text(fd, "name", 120);
@@ -132,11 +147,13 @@ export async function updateProject(fd: FormData): Promise<ActionResult> {
   if (!Number.isInteger(rounds) || rounds < 0 || rounds > 20) return { error: "Revision rounds must be 0–20." };
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data: changed, error } = await supabase
     .from("projects")
     .update({ name, summary: optionalText(fd, "summary", 500), revision_rounds_allowed: rounds })
-    .eq("id", projectId);
+    .eq("id", projectId)
+    .select("id");
   if (error) return failed(error);
+  if (!changed?.length) return { error: "Nothing was saved. Refresh the page and check you're signed in as admin." };
   refresh();
   return { ok: true };
 }
@@ -144,30 +161,34 @@ export async function updateProject(fd: FormData): Promise<ActionResult> {
 // --- stages & payments ------------------------------------------------------
 
 export async function updateStage(fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const stageId = uuid(fd, "stage_id");
   const status = text(fd, "status", 32) as StageStatus;
   if (!STAGE_STATUSES.includes(status)) return { error: "Unknown status." };
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data: changed, error } = await supabase
     .from("stages")
     .update({ status, due_date: optionalDate(fd, "due_date"), note: optionalText(fd, "note", 280) })
-    .eq("id", stageId);
+    .eq("id", stageId)
+    .select("id");
   if (error) return failed(error);
+  if (!changed?.length) return { error: "Nothing was saved. Refresh the page and check you're signed in as admin." };
   refresh();
   return { ok: true };
 }
 
 export async function updatePayment(fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const paymentId = uuid(fd, "payment_id");
   const amount = moneyToCents(text(fd, "amount", 20));
   if (amount === null) return { error: "Amount should look like 2500 or 2500.00." };
   const paidOn = optionalDate(fd, "paid_on");
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data: changed, error } = await supabase
     .from("payments")
     .update({
       amount_cents: amount,
@@ -175,8 +196,10 @@ export async function updatePayment(fd: FormData): Promise<ActionResult> {
       // Noon UTC so the calendar day doesn't shift when shown in another time zone.
       paid_at: paidOn ? `${paidOn}T12:00:00Z` : null,
     })
-    .eq("id", paymentId);
+    .eq("id", paymentId)
+    .select("id");
   if (error) return failed(error);
+  if (!changed?.length) return { error: "Nothing was saved. Refresh the page and check you're signed in as admin." };
   refresh();
   return { ok: true };
 }
@@ -184,7 +207,8 @@ export async function updatePayment(fd: FormData): Promise<ActionResult> {
 // --- updates feed -----------------------------------------------------------
 
 export async function postUpdate(fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const projectId = uuid(fd, "project_id");
   const body = text(fd, "body", 2000);
   if (!body) return { error: "Write something first." };
@@ -198,7 +222,8 @@ export async function postUpdate(fd: FormData): Promise<ActionResult> {
 }
 
 export async function deleteUpdate(fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const supabase = await createClient();
   const { data, error } = await supabase.from("updates").delete().eq("id", uuid(fd, "id")).select("image_path").maybeSingle();
   if (error) return failed(error, "Couldn't delete.");
@@ -210,7 +235,8 @@ export async function deleteUpdate(fd: FormData): Promise<ActionResult> {
 // --- approvals --------------------------------------------------------------
 
 export async function createApproval(fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const projectId = uuid(fd, "project_id");
   const title = text(fd, "title", 120);
   if (!title) return { error: "Give it a title." };
@@ -231,7 +257,8 @@ export async function createApproval(fd: FormData): Promise<ActionResult> {
 }
 
 export async function deleteApproval(fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("approvals")
@@ -248,7 +275,8 @@ export async function deleteApproval(fd: FormData): Promise<ActionResult> {
 // --- deliverable files ------------------------------------------------------
 
 export async function addFile(fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const projectId = uuid(fd, "project_id");
   const storagePath = ownedPath(optionalText(fd, "storage_path", 500), projectId, "deliverables");
   if (!storagePath) return { error: "Choose a file to upload." };
@@ -269,7 +297,8 @@ export async function addFile(fd: FormData): Promise<ActionResult> {
 }
 
 export async function deleteFile(fd: FormData): Promise<ActionResult> {
-  await requireAdmin();
+  const denied = await notAdmin();
+  if (denied) return denied;
   const supabase = await createClient();
   const { data, error } = await supabase.from("files").delete().eq("id", uuid(fd, "id")).select("storage_path").maybeSingle();
   if (error) return failed(error, "Couldn't delete.");

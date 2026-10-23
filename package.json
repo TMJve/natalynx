@@ -14,7 +14,8 @@
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local > src/lib/database.types.ts",
     "seed": "node --env-file=.env.local --import tsx scripts/seed.ts",
-    "make-admin": "node --env-file=.env.local --import tsx scripts/make-admin.ts"
+    "make-admin": "node --env-file=.env.local --import tsx scripts/make-admin.ts",
+    "login-link": "node --env-file=.env.production.local --import tsx scripts/login-link.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
